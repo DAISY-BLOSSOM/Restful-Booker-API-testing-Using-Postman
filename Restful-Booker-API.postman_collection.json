@@ -1,0 +1,653 @@
+{
+	"info": {
+		"_postman_id": "03d57fa3-3b20-48eb-9df0-5e78c70ba065",
+		"name": "Restful-Booker-API",
+		"description": "## The [Restful Booker API](https://restful-booker.herokuapp.com/apidoc/index.html#api-Booking-UpdateBooking) provides a comprehensive set of endpoints for managing hotel bookings. This API is designed to facilitate the creation, retrieval, update, and deletion of booking information within the context of a hotel booking system.EndFragment.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30497085"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "CreateToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" const responseData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Verify the request method is POST\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"POST\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has the required fields and token is existing\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object').and.to.have.property('token');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Token is a non-empty string\", function () {\r",
+									"    pm.expect(responseData.token).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Token should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set the token as a variable in the environment\", function () {\r",
+									"    pm.environment.set(\"authToken\", responseData.token);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"{{userName}}\",\n    \"password\" : \"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth"
+							]
+						},
+						"description": "### Auth Request\n\nThis endpoint is used to authenticate users.\n\n#### Request Body\n\n- username (string, required): The username of the user.\n- password (string, required): The password of the user.\n    \n\n#### Response\n\n- Status: 200 OK\n- token (string): An authentication token for the user."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking",
+			"item": [
+				{
+					"name": "GetBookingIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Verify the request method is GET\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"GET\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has the correct Content-Type header\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array with at least one element and each element is an object with bookingid property\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);\r",
+									"    responseData.forEach(function(booking) {\r",
+									"        pm.expect(booking).to.be.an('object').and.to.have.property('bookingid');\r",
+									"        pm.expect(booking.bookingid).to.be.a('number').and.to.be.at.least(0);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/booking",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"booking"
+							]
+						},
+						"description": "This endpoint makes an HTTP GET request to retrieve a list of bookings. The request does not require a request body. The response will have a status code of 200, and it will return an array of objects, each containing a \"bookingid\" key."
+					},
+					"response": []
+				},
+				{
+					"name": "CreateBooking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Verify the request method is POST\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"POST\");\r",
+									"});\r",
+									"\r",
+									"pm.test('Response status code is 200', function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test('Content-Type header is application/json', function () {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"})\r",
+									"\r",
+									"pm.test('Bookingid is a non-negative integer', function () {\r",
+									"    pm.expect(responseData.bookingid).to.be.a('number').and.to.be.at.least(0);\r",
+									"})\r",
+									"\r",
+									"pm.test('Booking object should exist and be an object, with non-empty firstname and lastname', function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.booking).to.be.an('object');\r",
+									"    pm.expect(responseData.booking.firstname).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Firstname should not be empty');\r",
+									"    pm.expect(responseData.booking.lastname).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Lastname should not be empty');\r",
+									"})\r",
+									"\r",
+									"pm.test('Totalprice is a non-negative integer', function () {\r",
+									"    pm.expect(responseData.booking.totalprice).to.be.a('number').and.to.be.at.least(0, 'Totalprice should be a non-negative integer');\r",
+									"})\r",
+									"\r",
+									"pm.test('Depositpaid is a boolean', function () {\r",
+									"    pm.expect(responseData.booking.depositpaid).to.be.a('boolean');\r",
+									"})\r",
+									"\r",
+									"pm.test('Checkin and checkout dates are in a valid date format', function () {\r",
+									"    pm.expect(responseData.booking.bookingdates.checkin).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"    pm.expect(responseData.booking.bookingdates.checkout).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Additional needs should be provided as String\", function () {\r",
+									"    pm.expect(responseData.booking.additionalneeds).to.be.a('string'); \r",
+									"});\r",
+									"\r",
+									"// store booking id as a variable\r",
+									"var bookingId = responseData.bookingid;\r",
+									"pm.environment.set('bookingId', bookingId)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\" : \"Nourhan\",\n    \"lastname\" : \"Ahmed\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2018-01-01\",\n        \"checkout\" : \"2019-01-01\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/booking",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"booking"
+							]
+						},
+						"description": "### Create a New Booking\n\nThis endpoint allows you to create a new booking.\n\n#### Request Body\n\n- `firstname` (string, required): The first name of the guest.\n- `lastname` (string, required): The last name of the guest.\n- `totalprice` (number, required): The total price of the booking.\n- `depositpaid` (boolean, required): Indicates if the deposit has been paid.\n- `bookingdates` (object, required): The check-in and check-out dates for the booking.\n    - `checkin` (string, required): The check-in date.\n    - `checkout` (string, required): The check-out date.\n- `additionalneeds` (string, optional): Any additional needs or requests for the booking.\n    \n\n#### Response\n\nUpon successful creation, the endpoint returns a status code of 200 along with the following response body:\n\n``` json\n{\n    \"bookingid\": 0,\n    \"booking\": {\n        \"firstname\": \"\",\n        \"lastname\": \"\",\n        \"totalprice\": 0,\n        \"depositpaid\": true,\n        \"bookingdates\": {\n            \"checkin\": \"\",\n            \"checkout\": \"\"\n        },\n        \"additionalneeds\": \"\"\n    }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "GetSpecificBooking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Verify the request method is GET\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"GET\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.firstname).to.exist;\r",
+									"    pm.expect(responseData.lastname).to.exist;\r",
+									"    pm.expect(responseData.totalprice).to.exist;\r",
+									"    pm.expect(responseData.depositpaid).to.exist;\r",
+									"    pm.expect(responseData.bookingdates).to.exist;\r",
+									"    pm.expect(responseData.additionalneeds).to.exist;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Firstname, lastname, and additionalneeds are strings\", function () {\r",
+									"    pm.expect(responseData.firstname).to.be.a('string');\r",
+									"    pm.expect(responseData.lastname).to.be.a('string');\r",
+									"    pm.expect(responseData.additionalneeds).to.be.a('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Totalprice is a non-negative integer\", function () {\r",
+									"    pm.expect(responseData.totalprice).to.be.a('number');\r",
+									"    pm.expect(responseData.totalprice).to.be.at.least(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Depositpaid is a boolean value\", function () {\r",
+									"    pm.expect(responseData.depositpaid).to.be.a('boolean');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Checkin and checkout dates are in a valid date format\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.bookingdates.checkin).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"    pm.expect(responseData.bookingdates.checkout).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/booking/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingId}}"
+							]
+						},
+						"description": "### Get Booking Details\n\nThis endpoint retrieves the details of a specific booking identified by the `bookingId`.\n\n**Request:**\n\n- Method: GET\n- Endpoint: `{{baseUrl}}/booking/{{bookingId}}`\n    \n\n**Response:**\n\n- Status: 200\n- Body:\n    \n    ``` json\n      {\n          \"firstname\": \"\",\n          \"lastname\": \"\",\n          \"totalprice\": 0,\n          \"depositpaid\": true,\n          \"bookingdates\": {\n              \"checkin\": \"\",\n              \"checkout\": \"\"\n          },\n          \"additionalneeds\": \"\"\n      }\n    \n     ```\n    \n\nThis request fetches the booking details including the first name, last name, total price, deposit paid status, booking dates, and additional needs."
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateBooking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Verify the request method is PUT\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"PUT\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('firstname');\r",
+									"    pm.expect(responseData).to.have.property('lastname');\r",
+									"    pm.expect(responseData).to.have.property('totalprice');\r",
+									"    pm.expect(responseData).to.have.property('depositpaid');\r",
+									"    pm.expect(responseData).to.have.property('bookingdates');\r",
+									"    pm.expect(responseData).to.have.property('additionalneeds');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Firstname, lastname, and additionalneeds are strings\", function () {\r",
+									"    pm.expect(responseData.firstname).to.be.a('string');\r",
+									"    pm.expect(responseData.lastname).to.be.a('string');\r",
+									"    pm.expect(responseData.additionalneeds).to.be.a('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Totalprice is a non-negative integer\", function () {\r",
+									"    pm.expect(responseData.totalprice).to.be.a('number');\r",
+									"    pm.expect(responseData.totalprice).to.be.at.least(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Depositpaid is a boolean value\", function () {\r",
+									"    pm.expect(responseData.depositpaid).to.be.a('boolean');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Checkin and checkout dates are in a valid date format\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.bookingdates.checkin).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"    pm.expect(responseData.bookingdates.checkout).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{userName}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "{{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\" : \"Hana\",\n    \"lastname\" : \"Mohamed\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2018-01-01\",\n        \"checkout\" : \"2019-02-01\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/booking/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingId}}"
+							]
+						},
+						"description": "This endpoint allows you to update a specific booking by sending an HTTP PUT request to the specified URL with the booking ID in the path parameter. The request should include a JSON payload in the raw request body type with the fields for firstname, lastname, totalprice, depositpaid, bookingdates (checkin and checkout), and additionalneeds.\n\n### Request Body\n\n- `firstname` (string): The first name of the guest.\n- `lastname` (string): The last name of the guest.\n- `totalprice` (number): The total price of the booking.\n- `depositpaid` (boolean): Indicates if the deposit has been paid.\n- `bookingdates` (object): Object containing the check-in and check-out dates for the booking.\n    - `checkin` (string): The check-in date.\n    - `checkout` (string): The check-out date.\n- `additionalneeds` (string): Any additional needs or requests for the booking.\n    \n\n### Response\n\nUpon successful execution, the endpoint returns a status code of 200 along with the updated booking details in the response body, including the firstname, lastname, totalprice, depositpaid, bookingdates, and additionalneeds.\n\nExample Response Body:\n\n``` json\n{\n    \"firstname\": \"\",\n    \"lastname\": \"\",\n    \"totalprice\": 0,\n    \"depositpaid\": true,\n    \"bookingdates\": {\n        \"checkin\": \"\",\n        \"checkout\": \"\"\n    },\n    \"additionalneeds\": \"\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "PartialUpdateBooking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Verify the request method is PATCH\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"PATCH\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('firstname');\r",
+									"    pm.expect(responseData).to.have.property('lastname');\r",
+									"    pm.expect(responseData).to.have.property('totalprice');\r",
+									"    pm.expect(responseData).to.have.property('depositpaid');\r",
+									"    pm.expect(responseData).to.have.property('bookingdates');\r",
+									"    pm.expect(responseData).to.have.property('additionalneeds');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Firstname, lastname, and additionalneeds are strings\", function () {\r",
+									"    pm.expect(responseData.firstname).to.be.a('string');\r",
+									"    pm.expect(responseData.lastname).to.be.a('string');\r",
+									"    pm.expect(responseData.additionalneeds).to.be.a('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Totalprice is a non-negative integer\", function () {\r",
+									"    pm.expect(responseData.totalprice).to.be.a('number');\r",
+									"    pm.expect(responseData.totalprice).to.be.at.least(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Depositpaid is a boolean value\", function () {\r",
+									"    pm.expect(responseData.depositpaid).to.be.a('boolean');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Checkin and checkout dates are in a valid date format\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.bookingdates.checkin).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"    pm.expect(responseData.bookingdates.checkout).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{userName}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "{{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\" : \"James\",\n    \"lastname\" : \"Brown\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/booking/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingId}}"
+							]
+						},
+						"description": "### Update Booking Details\n\nThis endpoint allows you to update the booking details by sending an HTTP PATCH request to `{{baseUrl}}/booking/{{bookingId}}`.\n\n#### Request Body\n\nThe request should include a JSON payload with the following parameters:\n\n- `firstname` (string): The first name of the guest.\n- `lastname` (string): The last name of the guest.\n    \n\n#### Response\n\nUpon a successful update, the endpoint will return a status code of 200 along with a JSON response containing the updated booking details:\n\n- `firstname` (string): The first name of the guest.\n- `lastname` (string): The last name of the guest.\n- `totalprice` (number): The total price of the booking.\n- `depositpaid` (boolean): Indicates if the deposit has been paid.\n- `bookingdates` (object): An object containing the check-in and check-out dates.\n    - `checkin` (string): The check-in date.\n    - `checkout` (string): The check-out date.\n- `additionalneeds` (string): Any additional needs or requests for the booking."
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteBooking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Verify the request method is DELETE\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"DELETE\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{userName}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "{{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/booking/{{bookingId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ping",
+			"item": [
+				{
+					"name": "HealthCheck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Verify the request method is GET\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"GET\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ping",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ping"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
